@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>خدمة التوفيق بين الأزواج</title>
+  <style>
+    /* ========== الخط والأنماط الأساسية ========== */
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: #f4faf0;
+      color: #2c3e2d;
+      line-height: 1.7;
+    }
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.05);
+    }
+    h1, h2, h3 { color: #1f4f2b; }
+    h1 { text-align: center; margin-bottom: 20px; font-size: 2rem; }
+    /* الألسنة */
+    .tabs { display: flex; gap: 5px; margin-bottom: 30px; flex-wrap: wrap; }
+    .tab-btn {
+      flex: 1; min-width: 120px; padding: 12px; border: 1px solid #1f4f2b;
+      background: #fff; color: #1f4f2b; font-weight: bold; border-radius: 8px 8px 0 0;
+      cursor: pointer; transition: 0.3s; font-size: 1rem;
+    }
+    .tab-btn.active { background: #1f4f2b; color: #fff; }
+    .tab-content { display: none; animation: fadeIn 0.4s; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    /* النماذج */
+    form { margin-top: 20px; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-weight: 500; margin-bottom: 5px; color: #1e4620; }
+    input, select, textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px;
+      font-family: inherit; font-size: 0.95rem; background: #fefefe;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #1f4f2b; outline: none; box-shadow: 0 0 0 2px rgba(31,79,43,0.15); }
+    .radio-group { display: flex; gap: 20px; align-items: center; }
+    .radio-group label { display: inline-flex; align-items: center; gap: 5px; font-weight: normal; }
+    button {
+      background: #1f4f2b; color: #fff; border: none; padding: 12px 25px; border-radius: 8px;
+      font-size: 1rem; cursor: pointer; transition: 0.3s; font-weight: 600; margin-top: 10px;
+    }
+    button:hover { background: #2d6a38; }
+    button.secondary { background: #e0c45b; color: #1f4f2b; }
+    button.danger { background: #c0392b; }
+    .inline { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+    /* بطاقات النتائج */
+    .result-card {
+      background: #f9fdf6; border: 1px solid #d4e8d0; border-radius: 12px; padding: 15px;
+      margin: 12px 0; cursor: pointer; transition: 0.2s;
+    }
+    .result-card:hover { background: #eef7e9; }
+    .filter-bar { background: #eaf4e5; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+    .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+    .modal {
+      display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); overflow-y: auto;
+    }
+    .modal-content {
+      background: #fff; max-width: 700px; margin: 40px auto; border-radius: 15px; padding: 25px;
+      position: relative; animation: slideIn 0.3s;
+    }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    .close-modal { position: absolute; top: 10px; right: 20px; font-size: 26px; cursor: pointer; color: #888; }
+    .spinner {
+      border: 4px solid #f3f3f3; border-top: 4px solid #1f4f2b; border-radius: 50%;
+      width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    /* فونت صغيرة للتفاصيل */
+    .small { font-size: 0.9rem; color: #5a6d5a; }
+    .required { color: #c0392b; }
+    @media (max-width: 600px) {
+      .container { margin: 10px; padding: 15px; }
+      .tabs { flex-direction: column; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🌸 خدمة التوفيق بين الأزواج 🌸</h1>
+
+  <!-- ألسنة التنقل -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="register">تسجيل استمارة</button>
+    <button class="tab-btn" data-tab="search">البحث عن شريك</button>
+    <button class="tab-btn" data-tab="edit">تعديل/حذف استمارة</button>
+  </div>
+
+  <!-- قسم التسجيل -->
+  <div id="register" class="tab-content active">
+    <h2>تسجيل استمارة جديدة</h2>
+    <div id="reg-form-container"></div>
+  </div>
+
+  <!-- قسم البحث -->
+  <div id="search" class="tab-content">
+    <h2>البحث عن شريك</h2>
+    <div id="search-filters"></div>
+    <div id="search-results"></div>
+    <div id="search-spinner" class="spinner" style="display:none;"></div>
+  </div>
+
+  <!-- قسم التعديل/الحذف -->
+  <div id="edit" class="tab-content">
+    <h2>تعديل أو حذف استمارة</h2>
+    <div id="edit-login">
+      <div class="form-group"><label>رمز الاستمارة</label><input type="text" id="edit-code" required></div>
+      <div class="form-group"><label>كلمة السر</label><input type="password" id="edit-password" required minlength="4"></div>
+      <button onclick="verifyEdit()">تحقق</button>
+      <div id="edit-login-error" style="color:red; margin-top:10px;"></div>
+    </div>
+    <div id="edit-form-container" style="display:none;">
+      <div id="edit-form"></div>
+      <button onclick="saveEdit()" class="secondary">حفظ التعديلات</button>
+      <button onclick="deleteProfile()" class="danger">حذف الاستمارة</button>
+    </div>
+  </div>
+
+  <!-- مودال عرض ملف كامل -->
+  <div id="profileModal" class="modal">
+    <div class="modal-content" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+  // ========== الإعدادات ==========
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxW2IUA2HgezUb6qaGSA-OuwcTCt9YLNpm8DyOdj9h_ks2AlXUFDVDXmN_AzLQlHTnKMQ/exec'; // ⚠️ استبدل بالرابط الخاص بك
+
+  // ========== حالة التطبيق ==========
+  let allProfiles = [];
+  let editProfileData = null;
+  let editPassword = '';
+
+  // ========== تعريف الحقول (Configuration) ==========
+  const fieldsConfig = {
+    shared: [
+      { name: "السن", type: "number", label: "السن", required: true },
+      { name: "الجنسية", type: "text", label: "الجنسية", defaultFunc: g => g==='bride'?'مصرية':'مصري' },
+      { name: "الطول", type: "number", label: "الطول (سم)" },
+      { name: "الوزن", type: "text", label: "الوزن (كجم أو 'متناسق')" },
+      { name: "لون البشرة", type: "select", label: "لون البشرة", options: ["بيضاء","قمحي","خمري","سمراء"] },
+      { name: "العمل", type: "select", label: "العمل", options: ["حكومي","خاص","لا أعمل"], required: true },
+      { name: "طبيعه العمل", type: "text", label: "طبيعة العمل" },
+      { name: "المؤهل الدراسي", type: "text", label: "المؤهل الدراسي" },
+      { name: "اصل العائله", type: "text", label: "أصل العائلة" },
+      { name: "الحاله الاجتماعيه", type: "select", label: "الحالة الاجتماعية", options: ["اعزب/عزباء","مطلق/مطلقه","ارمل/ارمله"], required: true },
+      { name: "وان كنت مطلق(ة) ما سبب الطلاق بصدق", type: "text", label: "سبب الطلاق (إن وجد)", showIf: d => d["الحاله الاجتماعيه"] && d["الحاله الاجتماعيه"].includes("مطلق") },
+      { name: "ان كنت مطلق(ة) او ارمل(ة) عدد الابناء و اعمارهم", type: "text", label: "عدد الأبناء وأعمارهم", showIf: d => d["الحاله الاجتماعيه"] && d["الحاله الاجتماعيه"] !== "اعزب/عزباء" },
+      { name: "الاولاد في حضانتك / مع الحاضنه", type: "text", label: "الأولاد في الحضانة؟", showIf: d => d["الحاله الاجتماعيه"] && d["الحاله الاجتماعيه"] !== "اعزب/عزباء" },
+      { name: "عمل الوالد", type: "text", label: "عمل الوالد" },
+      { name: "عمل الوالده", type: "text", label: "عمل الوالدة" },
+      { name: "عدد الاخوات ومؤهلاتهم الدراسية و حالتهم الاجتماعية", type: "text", label: "عدد الأخوات ومؤهلاتهن" },
+      { name: "الحاله الصحية", type: "text", label: "الحالة الصحية" },
+      { name: "هل تعاني من امراض مزمنه... بصدق", type: "text", label: "أمراض مزمنة؟", default: "لا" },
+      { name: "هل تمتلك(ين) سياره او وسيله مواصلات خاصه", type: "select", label: "سيارة خاصة؟", options: ["نعم","لا"] },
+      { name: "هل لديك(ي) الرغبه في الإنجاب", type: "select", label: "الرغبة في الإنجاب", options: ["نعم","لا","بالاتفاق"] },
+      { name: "مستوي التدين", type: "text", label: "مستوى التدين" },
+      { name: "مقدار حفظ القران", type: "text", label: "حفظ القرآن" },
+      { name: "كم مره تتصدق(ين) في العام", type: "text", label: "مرات الصدقة في العام" },
+      { name: "هل تصوم(ين) نوافل او تطوع", type: "select", label: "صيام النوافل", options: ["نعم","لا","احيانا"] },
+      { name: "التدخين", type: "select", label: "التدخين", options: ["نعم","لا"] },
+      { name: "هل لديك(ي) انتماءات سياسيه او دينيه", type: "text", label: "انتماءات سياسية/دينية" },
+      { name: "هل تشاهد(ين) او تسمع(ين) اغاني مسلسلات", type: "select", label: "مشاهدة مسلسلات/أغاني", options: ["نعم","لا","احيانا"] },
+      { name: "مدي ارتباطك بالانترنت تقضي عليه كام ساعه يوميا", type: "text", label: "ساعات الإنترنت يومياً" },
+      { name: "تكلم(ي) عن ما يقوله الناس عنك... (سطرين)", type: "textarea", label: "ماذا يقول الناس عنك" },
+      { name: "اهم عيوبك بكل صدق", type: "textarea", label: "أهم عيوبك" },
+      { name: "هل انت(ي) صاحب القرار ام تعود بالمشوره...", type: "textarea", label: "صاحب القرار أم بالمشورة" },
+      { name: "المواصفات التي تريد(ين)ها في شريك الحياه (سطرين)", type: "textarea", label: "مواصفات شريك الحياة" },
+      { name: "هل تقبل(ين) بعريس/عروسه مطلق(ة) او ارمل(ة)", type: "select", label: "تقبل مطلق/أرمل", options: ["نعم","لا"] },
+      { name: "هل تقبل(ين) بعريس/عروسه مطلق(ة) بدون اولاد", type: "select", label: "تقبل مطلق بدون أطفال", options: ["نعم","لا"] },
+      { name: "هل تقبل(ين) بعريس/عروسه مطلق(ة) ب اطفال", type: "select", label: "تقبل مطلق بأطفال", options: ["نعم","لا"] },
+      { name: "الطول المناسب للعريس/للعروسه", type: "number", label: "الطول المناسب للشريك" },
+      { name: "الوزن المناسب", type: "text", label: "الوزن المناسب" },
+      { name: "المؤهل المناسب", type: "text", label: "المؤهل المناسب" },
+      { name: "السن المناسب حتي سن", type: "number", label: "السن المناسب حتى" },
+      { name: "لون البشره (تفضيل)", type: "text", label: "لون البشرة المفضل" },
+      { name: "مستوي التدين (تفضيل)", type: "text", label: "مستوى التدين المفضل" },
+      { name: "تفضيل الشريك (لحيه/حجاب)", type: "select", label: "تفضيل اللحية/الحجاب", optionsFunc: g => g==='bride'?["بلحية","بدون لحية","لا يهم"]:["حجاب","نقاب","لا يهم"] },
+      { name: "عمل العريس/العروسه (تفضيل)", type: "text", label: "عمل الشريك المفضل" },
+      { name: "هل تقبل(ين) عريس/عروسه من محافظات اخري", type: "select", label: "تقبل من محافظات أخرى", options: ["نعم","لا"] },
+      { name: "المحافظات المقبولة", type: "text", label: "المحافظات المقبولة" },
+      { name: "هل تقبل(ين) جنسيات اخري", type: "select", label: "تقبل جنسيات أخرى", options: ["نعم","لا"] },
+      { name: "هل لديك(ي) استعداد في السكن ف محافظه العريس/العروسه", type: "select", label: "الاستعداد للسكن في محافظة الشريك", options: ["نعم","لا"] },
+      { name: "كم تفضل(ين) فتره الخطوبه", type: "text", label: "فترة الخطوبة المفضلة" },
+      { name: "هل توافق(ين) علي الزواج بدون قائمه منقولات...", type: "select", label: "الزواج بدون قائمة منقولات", options: ["نعم","لا"] },
+      { name: "هل توافق علي نشر استمارتك", type: "select", label: "الموافقة على نشر الاستمارة", options: ["نعم","لا"] },
+    ],
+    bride: [
+      { name: "نوع الحجاب", type: "select", label: "نوع الحجاب", options: ["نقاب","خمار","طرحه","لا يوجد"] },
+      { name: "موافقة علي التعدد", type: "select", label: "موافقة على التعدد", options: ["نعم","لا"] },
+      { name: "تفاصيل التعدد", type: "text", label: "تفاصيل التعدد إن وجدت" },
+      { name: "عندك استعداد تلبسي النقاب", type: "select", label: "الاستعداد لارتداء النقاب", options: ["نعم","لا"] },
+      { name: "هل تجيدين الطبخ و امور السكن", type: "select", label: "إجادة الطبخ وأمور السكن", options: ["نعم","لا"] },
+      { name: "هل يفرق معكي دخل الزوج", type: "text", label: "هل يفرق معك دخل الزوج" },
+      { name: "ما معني حسن التبعل بالنسبه لك", type: "textarea", label: "معنى حسن التبعل" },
+      { name: "ذمه ماليه (للعروسة فقط)", type: "select", label: "ذمة مالية", options: ["نعم","لا"] },
+      { name: "تقبل التعدد (عروسة)", type: "checkbox", label: "أرغب في إظهاري ضمن قائمة تقبل التعدد" }
+    ],
+    groom: [
+      { name: "هل تصلي في المسجد ام البيت", type: "select", label: "الصلاة في المسجد أم البيت", options: ["المسجد","البيت"] },
+      { name: "اللحيه", type: "select", label: "اللحية", options: ["لحية","خفيفة","بدون"] },
+      { name: "السكن", type: "select", label: "السكن", options: ["تمليك","ايجار","بيت عيله مستقل"] },
+      { name: "ما معني القوامه بالنسبه لك", type: "textarea", label: "معنى القوامة" },
+      { name: "ما رأيك في عمل المرأه و ذمتها المالية", type: "textarea", label: "رأيك في عمل المرأة وذمتها المالية" },
+      { name: "هل مستعد ان تفرش سكن الزوجيه بالكامل...", type: "select", label: "مستعد لفرش السكن بالكامل", options: ["نعم","لا"] },
+      { name: "مقدار الدخل الشهري (للعريس فقط)", type: "text", label: "الدخل الشهري" }
+    ]
+  };
+
+  // ========== دوال مساعدة ==========
+  function getCurrentGender(formId) {
+    const radio = document.querySelector(`#${formId} [name="نوع الاستمارة"]`);
+    return radio ? radio.value : 'bride';
+  }
+
+  // بناء النموذج ديناميكيًا
+  function buildForm(containerId, fields, includePassword, isEdit, existingData = {}) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    const formId = containerId + '-form';
+    const form = document.createElement('form');
+    form.id = formId;
+    form.setAttribute('autocomplete', 'off');
+
+    // اختيار النوع
+    const typeGroup = document.createElement('div');
+    typeGroup.className = 'form-group';
+    typeGroup.innerHTML = `<label>نوع الاستمارة</label>
+      <div class="radio-group">
+        <label><input type="radio" name="نوع الاستمارة" value="bride" ${existingData["نوع الاستمارة"] !== 'groom' ? 'checked' : ''}> عروسة</label>
+        <label><input type="radio" name="نوع الاستمارة" value="groom" ${existingData["نوع الاستمارة"] === 'groom' ? 'checked' : ''}> عريس</label>
+      </div>`;
+    form.appendChild(typeGroup);
+
+    // حاوية لباقي الحقول
+    const dynamicFields = document.createElement('div');
+    dynamicFields.id = formId + '-dynamic';
+    form.appendChild(dynamicFields);
+
+    function renderFields(gender) {
+      dynamicFields.innerHTML = '';
+      // محل السكن يختلف
+      if (gender === 'bride') {
+        addFieldToContainer(dynamicFields, { name: "محل السكن", type: "text", label: "محل السكن", required: true }, existingData);
+      } else {
+        addFieldToContainer(dynamicFields, { name: "محل مسكن الزوجيه", type: "text", label: "محل مسكن الزوجية", required: true }, existingData);
+      }
+
+      // حقول مشتركة
+      fields.shared.forEach(f => {
+        if (f.showIf && !f.showIf(existingData)) return;
+        addFieldToContainer(dynamicFields, f, existingData, gender);
+      });
+
+      // حقول خاصة بالعروسة
+      if (gender === 'bride') {
+        fields.bride.forEach(f => addFieldToContainer(dynamicFields, f, existingData, gender));
+      }
+      // حقول خاصة بالعريس
+      if (gender === 'groom') {
+        fields.groom.forEach(f => addFieldToContainer(dynamicFields, f, existingData, gender));
+      }
+
+      // كلمة السر (فقط في التسجيل)
+      if (includePassword) {
+        const pwdDiv = document.createElement('div');
+        pwdDiv.className = 'form-group';
+        pwdDiv.innerHTML = `<label>كلمة السر (للتعديل أو الحذف لاحقاً) <span class="required">*</span></label>
+                            <input type="password" name="كلمة السر" minlength="4" required>`;
+        dynamicFields.appendChild(pwdDiv);
+      }
+    }
+
+    function addFieldToContainer(container, field, data, gender) {
+      const div = document.createElement('div');
+      div.className = 'form-group';
+      let labelText = field.label;
+      if (field.required) labelText += ' <span class="required">*</span>';
+      let value = data[field.name] || (field.defaultFunc ? field.defaultFunc(gender) : field.default) || '';
+      if (field.type === 'select') {
+        let options = field.optionsFunc ? field.optionsFunc(gender) : field.options;
+        let opts = options.map(o => `<option value="${o}" ${value === o ? 'selected' : ''}>${o}</option>`).join('');
+        div.innerHTML = `<label>${labelText}</label><select name="${field.name}" ${field.required?'required':''}>${opts}</select>`;
+      } else if (field.type === 'textarea') {
+        div.innerHTML = `<label>${labelText}</label><textarea name="${field.name}" rows="3">${value}</textarea>`;
+      } else if (field.type === 'checkbox') {
+        div.innerHTML = `<label><input type="checkbox" name="${field.name}" ${value ? 'checked' : ''}> ${labelText}</label>`;
+      } else {
+        div.innerHTML = `<label>${labelText}</label><input type="${field.type}" name="${field.name}" value="${value}" ${field.required?'required':''}>`;
+      }
+      container.appendChild(div);
+    }
+
+    // حدث تغيير النوع
+    form.addEventListener('change', (e) => {
+      if (e.target.name === 'نوع الاستمارة') {
+        renderFields(e.target.value);
+        // إعادة تفعيل الشروط الخاصة
+        attachConditionalListeners(form);
+      }
+    });
+
+    renderFields(getCurrentGender(formId));
+    attachConditionalListeners(form);
+    container.appendChild(form);
+    return form;
+  }
+
+  function attachConditionalListeners(form) {
+    const statusSelect = form.querySelector('[name="الحاله الاجتماعيه"]');
+    if (statusSelect) {
+      statusSelect.addEventListener('change', updateConditionals);
+      updateConditionals.call(statusSelect);
+    }
+    function updateConditionals() {
+      const val = statusSelect.value;
+      const showDivorced = val && val.includes("مطلق");
+      const showNotSingle = val && val !== "اعزب/عزباء";
+      toggleField(form, "وان كنت مطلق(ة) ما سبب الطلاق بصدق", showDivorced);
+      toggleField(form, "ان كنت مطلق(ة) او ارمل(ة) عدد الابناء و اعمارهم", showNotSingle);
+      toggleField(form, "الاولاد في حضانتك / مع الحاضنه", showNotSingle);
+    }
+    function toggleField(form, name, show) {
+      const input = form.querySelector(`[name="${name}"]`);
+      if (input) {
+        const group = input.closest('.form-group');
+        if (group) group.style.display = show ? '' : 'none';
+      }
+    }
+  }
+
+  function getFormData(form) {
+    const data = {};
+    const elements = form.elements;
+    for (let el of elements) {
+      if (el.name && el.type !== 'submit' && el.type !== 'button') {
+        if (el.type === 'checkbox') {
+          data[el.name] = el.checked ? 'نعم' : '';
+        } else {
+          data[el.name] = el.value.trim();
+        }
+      }
+    }
+    return data;
+  }
+
+  // ========== التبويب ==========
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+      if (btn.dataset.tab === 'search') loadProfiles();
+    });
+  });
+
+  // ========== التسجيل ==========
+  const regForm = buildForm('reg-form-container', fieldsConfig, true, false);
+  regForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = getFormData(regForm);
+    data["نوع الاستمارة"] = getCurrentGender('reg-form-container') === 'bride' ? 'عروسة' : 'عريس';
+    if (data["كلمة السر"].length < 4) {
+      alert('كلمة السر يجب أن تكون 4 أحرف على الأقل');
+      return;
+    }
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({...data, action:'create'})
+      });
+      const json = await res.json();
+      if (json.error) { alert('خطأ: ' + json.error); return; }
+      alert(`تم التسجيل بنجاح! رمز الاستمارة: ${json.code}\nاحفظ هذا الرمز وكلمة السر للتعديل لاحقاً.`);
+      regForm.reset();
+    } catch (err) {
+      alert('فشل الاتصال بالخادم');
+    }
+  });
+
+  // ========== البحث ==========
+  async function loadProfiles() {
+    document.getElementById('search-spinner').style.display = 'block';
+    try {
+      const res = await fetch(SCRIPT_URL);
+      allProfiles = await res.json();
+      buildFilterUI();
+      applyFilters();
+    } catch (err) {
+      alert('خطأ في تحميل البيانات');
+    } finally {
+      document.getElementById('search-spinner').style.display = 'none';
+    }
+  }
+
+  function buildFilterUI() {
+    const filterDiv = document.getElementById('search-filters');
+    filterDiv.innerHTML = `
+      <div class="filter-bar">
+        <div class="filter-grid">
+          <div><label>النوع</label><select id="f-type"><option value="">الكل</option><option value="عروسة">عروسة</option><option value="عريس">عريس</option></select></div>
+          <div><label>السن (من - إلى)</label><div class="inline"><input type="number" id="f-age-min" placeholder="من" style="width:80px"><input type="number" id="f-age-max" placeholder="إلى" style="width:80px"></div></div>
+          <div><label>المدينة</label><input type="text" id="f-city"></div>
+          <div><label>المؤهل</label><input type="text" id="f-edu"></div>
+          <div><label>التدين</label><input type="text" id="f-deen"></div>
+          <div><label>التدخين</label><select id="f-smoke"><option value="">الكل</option><option value="نعم">نعم</option><option value="لا">لا</option></select></div>
+          <div><label>عمرك الحالي</label><input type="number" id="f-my-age" placeholder="للمقارنة مع السن المناسب"></div>
+        </div>
+        <button onclick="applyFilters()">بحث</button>
+        <button onclick="resetFilters()" class="secondary">إظهار الكل</button>
+      </div>`;
+  }
+
+  function applyFilters() {
+    const fType = document.getElementById('f-type').value;
+    const ageMin = +document.getElementById('f-age-min').value || 0;
+    const ageMax = +document.getElementById('f-age-max').value || 999;
+    const city = document.getElementById('f-city').value.trim().toLowerCase();
+    const edu = document.getElementById('f-edu').value.trim().toLowerCase();
+    const deen = document.getElementById('f-deen').value.trim().toLowerCase();
+    const smoke = document.getElementById('f-smoke').value;
+    const myAge = +document.getElementById('f-my-age').value || 0;
+
+    let filtered = allProfiles.filter(p => {
+      if (fType && p["نوع الاستمارة"] !== fType) return false;
+      const age = +p["السن"];
+      if (age < ageMin || age > ageMax) return false;
+      const loc = (p["محل السكن"] || p["محل مسكن الزوجيه"] || "").toLowerCase();
+      if (city && !loc.includes(city)) return false;
+      if (edu && !(p["المؤهل الدراسي"]||"").toLowerCase().includes(edu)) return false;
+      if (deen && !(p["مستوي التدين"]||"").toLowerCase().includes(deen)) return false;
+      if (smoke && p["التدخين"] !== smoke) return false;
+      if (myAge) {
+        const suitable = +p["السن المناسب حتي سن"];
+        if (suitable && myAge > suitable) return false;
+      }
+      return true;
+    });
+    displayResults(filtered);
+  }
+
+  function resetFilters() {
+    document.getElementById('f-type').value = '';
+    document.getElementById('f-age-min').value = '';
+    document.getElementById('f-age-max').value = '';
+    document.getElementById('f-city').value = '';
+    document.getElementById('f-edu').value = '';
+    document.getElementById('f-deen').value = '';
+    document.getElementById('f-smoke').value = '';
+    document.getElementById('f-my-age').value = '';
+    applyFilters();
+  }
+
+  function displayResults(profiles) {
+    const container = document.getElementById('search-results');
+    if (profiles.length === 0) {
+      container.innerHTML = '<p>لا توجد نتائج</p>';
+      return;
+    }
+    container.innerHTML = profiles.map(p => {
+      const type = p["نوع الاستمارة"];
+      const age = p["السن"];
+      const city = p["محل السكن"] || p["محل مسكن الزوجيه"];
+      return `<div class="result-card" onclick='showProfile(${JSON.stringify(p)})'>
+        <strong>${type} - ${age} سنة</strong> - ${city} - ${p["المؤهل الدراسي"]||""}
+      </div>`;
+    }).join('');
+  }
+
+  function showProfile(profile) {
+    const modal = document.getElementById('profileModal');
+    const body = document.getElementById('modal-body');
+    let html = '<span class="close-modal" onclick="closeModal()">&times;</span>';
+    html += '<h3>تفاصيل الاستمارة</h3>';
+    for (let key in profile) {
+      if (key === 'كلمة السر') continue;
+      html += `<p><strong>${key}:</strong> ${profile[key] || '-'}</p>`;
+    }
+    body.innerHTML = html;
+    modal.style.display = 'block';
+  }
+  window.closeModal = () => document.getElementById('profileModal').style.display = 'none';
+  window.onclick = (e) => { if (e.target.id === 'profileModal') closeModal(); };
+
+  // ========== التعديل/الحذف ==========
+  async function verifyEdit() {
+    const code = document.getElementById('edit-code').value.trim();
+    const password = document.getElementById('edit-password').value.trim();
+    if (!code || !password) return;
+    try {
+      const res = await fetch(`${SCRIPT_URL}?code=${encodeURIComponent(code)}&password=${encodeURIComponent(password)}`);
+      const data = await res.json();
+      if (data.error) {
+        document.getElementById('edit-login-error').textContent = data.error;
+        return;
+      }
+      editProfileData = data;
+      editPassword = password;
+      document.getElementById('edit-login').style.display = 'none';
+      document.getElementById('edit-form-container').style.display = 'block';
+      // بناء نموذج التعديل (بدون كلمة سر)
+      buildForm('edit-form', fieldsConfig, false, true, data);
+    } catch (err) {
+      document.getElementById('edit-login-error').textContent = 'خطأ في الاتصال';
+    }
+  }
+
+  async function saveEdit() {
+    if (!editProfileData || !editPassword) return;
+    const editForm = document.getElementById('edit-form-form');
+    const data = getFormData(editForm);
+    data["نوع الاستمارة"] = getCurrentGender('edit-form') === 'bride' ? 'عروسة' : 'عريس';
+    data.action = 'update';
+    data.code = editProfileData["رمز"];
+    data.password = editPassword;
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+      if (json.error) { alert('خطأ: ' + json.error); return; }
+      alert('تم حفظ التعديلات بنجاح');
+      resetEdit();
+    } catch (err) {
+      alert('فشل الاتصال');
+    }
+  }
+
+  async function deleteProfile() {
+    if (!confirm('هل أنت متأكد من حذف الاستمارة؟ لا يمكن التراجع.')) return;
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'delete',
+          code: editProfileData["رمز"],
+          password: editPassword
+        })
+      });
+      const json = await res.json();
+      if (json.error) { alert('خطأ: ' + json.error); return; }
+      alert('تم حذف الاستمارة بنجاح');
+      resetEdit();
+    } catch (err) {
+      alert('فشل الاتصال');
+    }
+  }
+
+  function resetEdit() {
+    document.getElementById('edit-login').style.display = 'block';
+    document.getElementById('edit-form-container').style.display = 'none';
+    document.getElementById('edit-code').value = '';
+    document.getElementById('edit-password').value = '';
+    editProfileData = null;
+    editPassword = '';
+  }
+</script>
+</body>
+</html>
