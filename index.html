@@ -368,8 +368,16 @@
   });
 
   // ========== التسجيل ==========
-  const regForm = buildForm('reg-form-container', fieldsConfig, true, false);
-  regForm.addEventListener('submit', async (e) => {
+const regForm = buildForm('reg-form-container', fieldsConfig, true, false);
+// إضافة زر الإرسال
+const submitButton = document.createElement('button');
+submitButton.type = 'submit';
+submitButton.textContent = 'إرسال الاستمارة';
+submitButton.style.marginTop = '20px';
+submitButton.style.width = '100%';
+regForm.appendChild(submitButton);
+
+regForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = getFormData(regForm);
     data["نوع الاستمارة"] = getCurrentGender('reg-form-container') === 'bride' ? 'عروسة' : 'عريس';
